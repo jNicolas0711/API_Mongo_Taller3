@@ -37,10 +37,11 @@ def get_comentarios(bar_id: int):
 
 
 @app.post('/bares/{bar_id}/comentarios')
-def post_comentario(bar_id: int, datos: dict):
+def post_comentario(bar_id: int, datos: dict,coment: str):
 
     datos['bar_id'] = bar_id
     datos['fecha'] = datetime.now().isoformat()
+    datos['coment'] = coment
 
     db.comentarios.insert_one(datos)
 
