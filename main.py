@@ -26,7 +26,7 @@ def inicio():
 @app.get("/bares")
 def get_bares():
     bares = list(
-        db.bares.find({}, {'_id': 1, 'nombre': 1})
+        db.Bares.find({}, {'_id': 1, 'nombre': 1})
     )
 
     for b in bares:
@@ -38,7 +38,7 @@ def get_bares():
 @app.get('/bares/{bar_id}/comentarios')
 def get_comentarios(bar_id: int):
 
-    bar = db.bares.find_one(
+    bar = db.Bares.find_one(
         {'_id': bar_id},
         {'_id': 0, 'comentarios': 1}
     )
@@ -58,11 +58,11 @@ def post_comentario(bar_id: int, coment: str, autor: str):
         'fecha': datetime.now().isoformat()
     }
 
-    db.bares.update_one(
+    db.Bares.update_one(
         {'_id': bar_id},
         {
             '$push': {
-                'comentarios': comentario
+                'Comentarios': comentario
             }
         }
     )
@@ -75,7 +75,7 @@ def post_comentario(bar_id: int, coment: str, autor: str):
 def get_eventos(bar_id: int):
 
     eventos = list(
-        db.eventos.find(
+        db.Eventos.find(
             {'bar_id': bar_id},
             {'_id': 0}
         )
@@ -93,7 +93,7 @@ def post_evento(bar_id: int, datos: dict, costo:int, nombre:str):
     datos['costoEntrada'] = costo
     datos['nombre'] = nombre
 
-    db.eventos.insert_one(datos)
+    db.Eventos.insert_one(datos)
 
     return {'mensaje': 'Evento guardado'}
 
