@@ -14,6 +14,7 @@ app.add_middleware(
 )
 
 # os.environ para despliegue. Descomente cuando ya probó todo local.
+
 client = MongoClient(os.environ["MONGO_URI"])
 db = client["ISIS2304D09202610"]
 
@@ -26,26 +27,36 @@ def inicio():
 @app.get('/bares/{bar_id}/comentarios')
 def get_comentarios(bar_id: int):
 
-    comentarios = list(
-        db.comentarios.find(
-            {'bar_id': bar_id},
-            {'_id': 0}
-        )
+    bar = db.bares.find_one(
+        {'_id': bar_id},
+        {'_id': 0, 'comentarios': 1}
     )
 
-    return comentarios
+    if not bar:
+        return {"error": "Bar no encontrado"}
+
+    return bar.get('comentarios', [])
 
 
 @app.post('/bares/{bar_id}/comentarios')
-def post_comentario(bar_id: int, datos: dict,coment: str):
+def post_comentario(bar_id: int, coment: str, autor: str):
 
-    datos['bar_id'] = bar_id
-    datos['fecha'] = datetime.now().isoformat()
-    datos['coment'] = coment
+    comentario = {
+        'autor': autor,
+        'reseña': coment,
+        'fecha': datetime.now().isoformat()
+    }
 
-    db.comentarios.insert_one(datos)
+    db.bares.update_one(
+        {'_id': bar_id},
+        {
+            '$push': {
+                'comentarios': comentario
+            }
+        }
+    )
 
-    return {'mensaje': 'Comentario guardado'}
+    return {'mensaje': 'Comentario agregado al bar'}
 
 
 # GET eventos
@@ -64,11 +75,14 @@ def get_eventos(bar_id: int):
 
 # POST eventos
 @app.post('/bares/{bar_id}/eventos')
-def post_evento(bar_id: int, datos: dict):
+def post_evento(bar_id: int, datos: dict, costo:int, nombre:str):
 
-    datos['bar_id'] = bar_id
+    datos['barId'] = bar_id
     datos['fecha_creacion'] = datetime.now().isoformat()
+    datos['costoEntrada'] = costo
+    datos['nombre'] = nombre
 
     db.eventos.insert_one(datos)
 
     return {'mensaje': 'Evento guardado'}
+
