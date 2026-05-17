@@ -34,6 +34,14 @@ def get_bares():
 
     return bares
 
+@app.get("/test-db")
+def test_db():
+
+    return {
+        "bases": client.list_database_names(),
+        "colecciones": db.list_collection_names()
+    }
+#Fin validaciones
 
 @app.get('/bares/{bar_id}/comentarios')
 def get_comentarios(bar_id: int):
