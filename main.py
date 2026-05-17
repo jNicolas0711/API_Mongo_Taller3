@@ -23,6 +23,17 @@ db = client["ISIS2304D09202610"]
 def inicio():
     return {"estado": "API funcionando correctamente"}
 
+@app.get("/bares")
+def get_bares():
+    bares = list(
+        db.bares.find({}, {'_id': 1, 'nombre': 1})
+    )
+
+    for b in bares:
+        b['_id'] = str(b['_id'])
+
+    return bares
+
 
 @app.get('/bares/{bar_id}/comentarios')
 def get_comentarios(bar_id: int):
