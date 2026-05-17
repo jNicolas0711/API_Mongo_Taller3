@@ -23,28 +23,9 @@ db = client["ISIS2304D09202610"]
 def inicio():
     return {"estado": "API funcionando correctamente"}
 
-@app.get("/bares")
-def get_bares():
-    bares = list(
-        db.Bares.find({}, {'_id': 1, 'nombre': 1})
-    )
-
-    for b in bares:
-        b['_id'] = str(b['_id'])
-
-    return bares
-
-@app.get("/test-db")
-def test_db():
-
-    return {
-        "bases": client.list_database_names(),
-        "colecciones": db.list_collection_names()
-    }
-#Fin validaciones
 
 @app.get('/bares/{bar_id}/comentarios')
-def get_comentarios(bar_id: int):
+def get_comentarios(bar_id: str):
 
     bar = db.Bares.find_one(
         {'_id': bar_id},
@@ -58,7 +39,7 @@ def get_comentarios(bar_id: int):
 
 
 @app.post('/bares/{bar_id}/comentarios')
-def post_comentario(bar_id: int, coment: str, autor: str):
+def post_comentario(bar_id: str, coment: str, autor: str):
 
     comentario = {
         'autor': autor,
@@ -80,7 +61,7 @@ def post_comentario(bar_id: int, coment: str, autor: str):
 
 # GET eventos
 @app.get('/bares/{bar_id}/eventos')
-def get_eventos(bar_id: int):
+def get_eventos(bar_id: str):
 
     eventos = list(
         db.Eventos.find(
@@ -94,7 +75,7 @@ def get_eventos(bar_id: int):
 
 # POST eventos
 @app.post('/bares/{bar_id}/eventos')
-def post_evento(bar_id: int, datos: dict, costo:int, nombre:str):
+def post_evento(bar_id: str, datos: dict, costo:int, nombre:str):
 
     datos['barId'] = bar_id
     datos['fecha_creacion'] = datetime.now().isoformat()
